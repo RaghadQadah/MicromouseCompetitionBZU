@@ -203,37 +203,37 @@ void loop() {
 //--------------------------------- direction control ---------------------------------//
 
 void setDirection(int dir) {
-  Serial.print("set Direction ..\n");
+  Serial.print("set Direction .. \n\n");
   if ( dir == FORWARD ) {
-     Serial.print("GO FORWARD ..");
+     Serial.print("GO FORWARD .. \n");
     digitalWrite(en1, LOW);   // Left wheel forward
     digitalWrite(en2, HIGH);
     digitalWrite(en3, LOW);  // Right wheel forward
     digitalWrite(en4, HIGH);
   }
   else if ( dir == LEFT ) {
-    Serial.print("GO LEFT ..");
+    Serial.print("GO LEFT .. \n");
     digitalWrite(en1, HIGH);   // Left wheel forward
     digitalWrite(en2, LOW );
     digitalWrite(en3, LOW );  // Right wheel forward
     digitalWrite(en4, HIGH);
   }
   else if ( dir == RIGHT ) {
-    Serial.print("GO RIGHT ..");
+    Serial.print("GO RIGHT .. \n");
     digitalWrite(en1, LOW);   // Left wheel forward
     digitalWrite(en2, HIGH);
     digitalWrite(en3, HIGH);  // Right wheel forward
     digitalWrite(en4, LOW);
   }
   else if ( dir == STOP ) {
-    Serial.print("STOP!!!!!!! ..");
+    Serial.print("STOP!!!!!!! .. \n");
     digitalWrite(en1, HIGH);   // Left wheel forward
     digitalWrite(en2, HIGH );
     digitalWrite(en3, HIGH );  // Right wheel forward
     digitalWrite(en4, HIGH);
   }
   else if ( dir == BACKWARD ) {
-    Serial.print("GO BACKWARD ..");
+    Serial.print("GO BACKWARD .. \n");
     digitalWrite(en1, HIGH );   // Left wheel forward
     digitalWrite(en2, LOW );
     digitalWrite(en3, HIGH );  // Right wheel forward
@@ -246,7 +246,7 @@ void setDirection(int dir) {
 //--------------------------------- Sensors ---------------------------------//
 
 void ReadSensors() {
-Serial.print("Start Read Sensors ..");
+Serial.print("Start Read Sensors .. \n");
   //leftSensor = sonarLeft.ping_median(TestNUM);     //accurate but slow
   //rightSensor = sonarRight.ping_median(TestNUM);     //accurate but slow
   //frontSensor = sonarFront.ping_median(TestNUM);     //accurate but slow
@@ -277,7 +277,7 @@ Serial.print("Start Read Sensors ..");
 //--------------------------------- control ---------------------------------//
 
 void pid_start() {
-Serial.print("pid_start ..");
+Serial.print("pid_start .. \n");
   float errorP = leftSensor - rightSensor ;
   float errorD = errorP - oldErrorP;
   float errorI = (2.0 / 3.0) * errorI + errorP ;
@@ -296,7 +296,7 @@ Serial.print("pid_start ..");
 
     analogWrite(enA , RMS);
     analogWrite(enB , LMS);
- Serial.print("GO RIGHT ..");
+ Serial.print("GO RIGHT .. \n");
     setDirection(RIGHT);
 
   }
@@ -306,14 +306,14 @@ Serial.print("pid_start ..");
 
     analogWrite(enA , RMS);
     analogWrite(enB , LMS);
- Serial.print("GO LEFT ..");
+ Serial.print("GO LEFT .. \n");
     setDirection(LEFT);
   }
   else {
 
     analogWrite(enA , RMS);
     analogWrite(enB , LMS);
- Serial.print("GO FORWARD ..");
+ Serial.print("GO FORWARD .. \n");
     setDirection(FORWARD);
   }
 
@@ -323,9 +323,9 @@ Serial.print("pid_start ..");
 //----------------------------- wall follow  control -------------------------------//
 
 void PID( boolean left ) {
- Serial.print("PID ..");
+ Serial.print("PID .. \n");
   if (left == true ) {
- Serial.print("left true ..");
+ Serial.print("left true .. \n");
     float errorP = leftSensor - rightSensor - offset ;
     float errorD = errorP - oldErrorP;
     float errorI = (2.0 / 3) * errorI + errorP ;
@@ -349,7 +349,7 @@ void PID( boolean left ) {
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO RIGHT ..");
+Serial.print("GO RIGHT .. \n");
       setDirection(RIGHT);
 
     }
@@ -359,14 +359,14 @@ Serial.print("GO RIGHT ..");
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO LEFT ..");
+Serial.print("GO LEFT .. \n");
       setDirection(LEFT);
     }
     else {
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO FORWARD ..");
+Serial.print("GO FORWARD .. \n");
       setDirection(FORWARD);
     }
 
@@ -387,7 +387,7 @@ Serial.print("GO FORWARD ..");
 
     //  if(RMS < -255) RMS = -255; if(RMS > 255)RMS = 255 ;
     //  if(LMS < -255) LMS = -255;  if(LMS > 255)LMS = 255 ;
-Serial.print("Left false ..");
+Serial.print("Left false .. \n");
 
     if (RMS < 0) {
 
@@ -395,7 +395,7 @@ Serial.print("Left false ..");
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO RIGHT ..");
+Serial.print("GO RIGHT .. \n");
       setDirection(RIGHT);
 
     }
@@ -405,14 +405,14 @@ Serial.print("GO RIGHT ..");
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO LEFT ..");
+Serial.print("GO LEFT .. \n");
       setDirection(LEFT);
     }
     else {
 
       analogWrite(enA , RMS);
       analogWrite(enB , LMS);
-Serial.print("GO FORWARD ..");
+Serial.print("GO FORWARD .. \n");
       setDirection(FORWARD);
     }
 
@@ -423,34 +423,35 @@ Serial.print("GO FORWARD ..");
 //--------------------------- wall detection --------------------------------//
 
 void walls() {
+    Serial.print("** Check walls ** \n");
 
 
   if ( leftSensor < wall_threshold ) {
     leftwall = true ;
-    Serial.print("Left wall ..");
+    Serial.print("Left wall .. \n");
   }
   else {
     leftwall = false ;
-    Serial.print("Left no wall ..");
+    Serial.print("Left no wall .. \n");
   }
 
 
   if ( rightSensor < wall_threshold ) {
     rightwall = true ;
-    Serial.print("right wall ..");
+    Serial.print("right wall .. \n");
   }
   else {
     rightwall = false ;
-    Serial.print("right no wall ..");
+    Serial.print("right no wall .. \n");
 
 
   } if ( frontSensor < front_threshold ) {
     frontwall = true ;
-    Serial.print("front wall ..");
+    Serial.print("front wall .. \n");
   }
   else {
     frontwall = false ;
-    Serial.print("front no wall ..");
+    Serial.print("front no wall .. \n");
   }
 
 }
@@ -466,7 +467,7 @@ void turnright() {
 
   RMS = LMS * rightSensor / ( rightSensor + 11 ) ;
 
-Serial.print("turn right ..");
+Serial.print("turn right .. \n");
 }
 
 //---------------------------------------------------------------------------//
@@ -477,7 +478,7 @@ void turnleft() {
   RMS = baseSpeed ;
 
   LMS = RMS * leftSensor / ( leftSensor + 11 ) ;
-Serial.print("turn left ..");
+Serial.print("turn left .. \n");
 }
 
 
