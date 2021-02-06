@@ -1,21 +1,22 @@
 
 // Parameters
-const int drive_distance = 22;   // cm
-const int motor_power = 200;      // 0-255
+const int drive_distance = 1000;   // cm
+const int motor_power = 150;      // 0-255
 const int motor_offset = 5;       // Diff. when driving straight
-const int wheel_d = 66.1;           // Wheel diameter (mm)
+const int wheel_d = 66;           // Wheel diameter (mm)
 const float wheel_c = PI * wheel_d; // Wheel circumference (mm)
-const int counts_per_rev = 384;   // (4 pairs N-S) * (48:1 gearbox) * (2 falling/rising edges) = 384
+const int counts_per_rev = 960;   // (4 pairs N-S) * (48:1 gearbox) * (2 falling/rising edges) = 384
 
 // Pins
 const int enc_l_pin = 2;          // Motor A
 const int enc_r_pin = 3;          // Motor B
-const int pwma_pin = 6;
-const int ain1_pin = 8;
-const int ain2_pin = 9;
-const int pwmb_pin = 7;
-const int bin1_pin = 10;
-const int bin2_pin = 11;
+const int pwma_pin = 10;//right
+const int ain1_pin = 6;
+const int ain2_pin = 7;
+const int pwmb_pin = 11;//left
+const int bin1_pin = 9;
+const int bin2_pin = 8;
+
 
 //sensor 
 int trigPinL =A2;
@@ -28,7 +29,7 @@ int echoPinR = 4;
 boolean wallFront ;
 boolean wallLeft ;
 boolean wallRight ;
-int wall_threshold = 10;
+int wall_threshold = 20;
 float leftSensor, rightSensor, frontSensor;
 // Globals
 volatile unsigned long enc_l = 0;
@@ -72,7 +73,6 @@ void loop() {
 }
 
 void driveStraight(float dist, int power) {
-
   unsigned long num_ticks_l;
   unsigned long num_ticks_r;
 
@@ -97,27 +97,42 @@ void driveStraight(float dist, int power) {
   unsigned long target_count = num_rev * counts_per_rev;
   
   // Debug
-  Serial.print("Driving for ");
-  Serial.print(dist);
-  Serial.print(" cm (");
-  Serial.print(target_count);
-  Serial.print(" ticks) at ");
-  Serial.print(power);
-  Serial.println(" motor power");
+  //Serial.print("Driving for ");
+  //Serial.print(dist);
+ // Serial.print(" cm (");
+  //Serial.print(target_count);
+//  Serial.print(" ticks) at ");
+//  Serial.print(power);
+//  Serial.println(" motor power");
 
   // Drive until one of the encoders reaches desired count
   while ( (enc_l < target_count) && (enc_r < target_count) ) {
     ReadSensors();
-    walls();
+    walls(); 
+    Serial.print("wallLeft ");
+    Serial.println(wallLeft);
+    Serial.print("wallRight ");
+    
+    Serial.println(wallRight);
+    Serial.print("wallFront ");
+    Serial.println(wallFront);
      if(!wallLeft){
-    digitalWrite(bin1_pin, LOW); //left 90 degree
+      digitalWrite(ain1_pin, LOW); //left 90 degree
+    digitalWrite(ain2_pin, HIGH);
+    digitalWrite(bin1_pin, LOW);
     digitalWrite(bin2_pin, HIGH);
+    analogWrite(pwma_pin, 100);
+  analogWrite(pwmb_pin, 100);
+    delay(200);
+ 
     digitalWrite(ain1_pin, HIGH);
     digitalWrite(ain2_pin, LOW);
-    analogWrite(pwma_pin, 150);
-  analogWrite(pwmb_pin, 150);
+    digitalWrite(bin1_pin, LOW); //left 90 degree
+    digitalWrite(bin2_pin, LOW);
+    analogWrite(pwma_pin, 255);
+analogWrite(pwmb_pin, 50);
   Serial.println("left 90 degree ");
-    delay(100);
+    delay(200);
     brake();
     //delay(10000);
   }
@@ -127,9 +142,9 @@ void driveStraight(float dist, int power) {
     num_ticks_r = enc_r;
 
     // Print out current number of ticks
-    Serial.print(num_ticks_l);
-    Serial.print("\t");
-    Serial.println(num_ticks_r);
+//    Serial.print(num_ticks_l);
+//    Serial.print("\t");
+//    Serial.println(num_ticks_r);
 
     // Drive
     drive(power_l, power_r);
@@ -160,12 +175,20 @@ void driveStraight(float dist, int power) {
   else if (!wallRight){
     digitalWrite(ain1_pin, LOW); //right 90 degree
     digitalWrite(ain2_pin, HIGH);
+    digitalWrite(bin1_pin, LOW);
+    digitalWrite(bin2_pin, HIGH);
+      analogWrite(pwma_pin, 100);
+  analogWrite(pwmb_pin, 100);
+    delay(200);
+    
+    digitalWrite(ain1_pin, LOW); //right 90 degree
+    digitalWrite(ain2_pin, LOW);
     digitalWrite(bin1_pin, HIGH);
     digitalWrite(bin2_pin, LOW);
-    analogWrite(pwma_pin, 150);
-  analogWrite(pwmb_pin, 150);
+    analogWrite(pwma_pin, 50);
+  analogWrite(pwmb_pin, 255);
     Serial.println("right 90 degree ");
-    delay(100);
+    delay(200);
     brake();
   }
     
@@ -177,8 +200,8 @@ void driveStraight(float dist, int power) {
 void drive(int power_a, int power_b) {
 
   // Constrain power to between -255 and 255
-  power_a = constrain(power_a, -255, 255);
-  power_b = constrain(power_b, -255, 255);
+  power_a = constrain(power_a, 0, 100);
+  power_b = constrain(power_b, 0, 100);
 
   // Left motor direction
   if ( power_a < 0 ) {
