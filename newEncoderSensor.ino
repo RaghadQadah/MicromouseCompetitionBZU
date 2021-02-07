@@ -8,8 +8,8 @@ const float wheel_c = PI * wheel_d; // Wheel circumference (mm)
 const int counts_per_rev = 960;   // (4 pairs N-S) * (48:1 gearbox) * (2 falling/rising edges) = 384
 
 // Pins
-const int enc_l_pin = 2;          // Motor A
-const int enc_r_pin = 3;          // Motor B
+const int enc_l_pin = A1;          // Motor A
+const int enc_r_pin = A0;          // Motor B
 const int pwma_pin = 10;//right
 const int ain1_pin = 6;
 const int ain2_pin = 7;
@@ -59,7 +59,9 @@ void setup() {
   // Set up interrupts
   attachInterrupt(digitalPinToInterrupt(enc_l_pin), countLeft, CHANGE);
   attachInterrupt(digitalPinToInterrupt(enc_r_pin), countRight, CHANGE);
-
+  
+  Serial.println(enc_l);
+  Serial.println(enc_r);
   // Drive straight
   //delay(1000);
 //  enableMotors(true);
@@ -116,27 +118,8 @@ void driveStraight(float dist, int power) {
     Serial.println(wallRight);
     Serial.print("wallFront ");
     Serial.println(wallFront);
-     if(!wallLeft){
-      digitalWrite(ain1_pin, LOW); //left 90 degree
-    digitalWrite(ain2_pin, HIGH);
-    digitalWrite(bin1_pin, LOW);
-    digitalWrite(bin2_pin, HIGH);
-    analogWrite(pwma_pin, 100);
-  analogWrite(pwmb_pin, 100);
-    delay(200);
- 
-    digitalWrite(ain1_pin, HIGH);
-    digitalWrite(ain2_pin, LOW);
-    digitalWrite(bin1_pin, LOW); //left 90 degree
-    digitalWrite(bin2_pin, LOW);
-    analogWrite(pwma_pin, 255);
-analogWrite(pwmb_pin, 50);
-  Serial.println("left 90 degree ");
-    delay(200);
-    brake();
-    //delay(10000);
-  }
-    else if(!wallFront){
+   
+    if(!wallFront){
     // Sample number of encoder ticks
     num_ticks_l = enc_l;
     num_ticks_r = enc_r;
@@ -171,27 +154,54 @@ analogWrite(pwmb_pin, 50);
 
     // Brief pause to let motors respond
    // delay(20);
-  }
-  else if (!wallRight){
-    digitalWrite(ain1_pin, LOW); //right 90 degree
+  }else if(!wallLeft){
+      
+      digitalWrite(ain1_pin, LOW); //left 90 degree
     digitalWrite(ain2_pin, HIGH);
     digitalWrite(bin1_pin, LOW);
     digitalWrite(bin2_pin, HIGH);
-      analogWrite(pwma_pin, 100);
+    analogWrite(pwma_pin, 100);
   analogWrite(pwmb_pin, 100);
-    delay(200);
+    delay(100);
+      int l=enc_l;
+      while(((enc_l-l)) <  (int)(((32*PI/4)/wheel_c)*counts_per_rev)){
+    digitalWrite(ain1_pin, HIGH);
+    digitalWrite(ain2_pin, LOW);
+    digitalWrite(bin1_pin, LOW); //left 90 degree
+    digitalWrite(bin2_pin, LOW);
+      
+      }
+      l=0;
+ //   analogWrite(pwma_pin, 255);
+//analogWrite(pwmb_pin, 50);
+  Serial.println("left 90 degree ");
+  //  delay(200);
+  //  brake();
+    //delay(10000);
+  }
+  else if (!wallRight){
+      digitalWrite(ain1_pin, LOW); //back 
+    digitalWrite(ain2_pin, HIGH);
+    digitalWrite(bin1_pin, LOW);
+    digitalWrite(bin2_pin, HIGH);
+    analogWrite(pwma_pin, 100);
+  analogWrite(pwmb_pin, 100);
+    delay(100);
     
+    int r=enc_r;
+      while(((enc_r-r)) <  (int)(1+((32*PI/4)/wheel_c)*counts_per_rev)){
     digitalWrite(ain1_pin, LOW); //right 90 degree
     digitalWrite(ain2_pin, LOW);
     digitalWrite(bin1_pin, HIGH);
-    digitalWrite(bin2_pin, LOW);
-    analogWrite(pwma_pin, 50);
-  analogWrite(pwmb_pin, 255);
+    digitalWrite(bin2_pin, LOW);}
+   // analogWrite(pwma_pin, 50);
+ // analogWrite(pwmb_pin, 255);
     Serial.println("right 90 degree ");
-    delay(200);
-    brake();
+    //delay(200);
+  //  brake();
+  r=0;
   }
-    
+   
   }
 
   // Brake
